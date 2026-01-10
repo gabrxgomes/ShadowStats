@@ -1,0 +1,82 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+.next/
+out/
+build/
+dist/
+
+# Testing
+coverage/
+playwright-report/
+test-results/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Bun
+bun.lockb
+
+# Debug
+.debug/
+
+# Local development files - NOT COMMITTED
+DEVLOG.md
+DEVLOG_*.md
+*.local.md
+.scratch/
+.notes/
+TODO.local.md
+
+# Sensitive files
+*.pem
+*.key
+secrets/
+.secrets
+
+# Supabase
+supabase/.temp/
+
+# Playwright
+/playwright/.cache/
+
+# Turbo
+.turbo
+
+# PWA
+**/public/sw.js
+**/public/workbox-*.js
+**/public/worker-*.js
