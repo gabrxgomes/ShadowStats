@@ -65,6 +65,7 @@ TODO.local.md
 # Assistant tools
 .assistant/
 .ai-tools/
+.*/workspace/
 
 # Sensitive files
 *.pem
@@ -85,3 +86,4 @@ supabase/.temp/
 **/public/sw.js
 **/public/workbox-*.js
 **/public/worker-*.js
+.claude/
