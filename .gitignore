@@ -62,9 +62,9 @@ DEVLOG_*.md
 TODO.local.md
 *_PROMPT.md
 
-# Development tools
-.claude/
-.ai/
+# Assistant tools
+.assistant/
+.ai-tools/
 
 # Sensitive files
 *.pem
