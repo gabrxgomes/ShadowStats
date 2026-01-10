@@ -60,6 +60,10 @@ DEVLOG_*.md
 .scratch/
 .notes/
 TODO.local.md
+CLAUDE_CODE_PROMPT.md
+
+# Claude Code
+.claude/
 
 # Sensitive files
 *.pem
