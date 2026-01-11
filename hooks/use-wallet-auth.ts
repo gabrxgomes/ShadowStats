@@ -46,16 +46,36 @@ export function useWalletAuth() {
 
     try {
       // Create message to sign
-      const message = new TextEncoder().encode(
-        `Sign this message to authenticate with ShadowStats.\n\nWallet: ${publicKey.toBase58()}\nTimestamp: ${Date.now()}`
-      )
+      const messageText = `Sign this message to authenticate with ShadowStats.\n\nWallet: ${publicKey.toBase58()}\nTimestamp: ${Date.now()}`
+      const message = new TextEncoder().encode(messageText)
 
-      // Request signature
+      // Request signature from wallet
       const signature = await signMessage(message)
 
-      // TODO: Send signature to backend for verification
-      // For now, just return true
-      console.log('Signature:', signature)
+      // Convert signature to hex string
+      const signatureHex = Array.from(signature)
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('')
+
+      // Send to backend for verification
+      const response = await fetch('/api/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          wallet: publicKey.toBase58(),
+          signature: signatureHex,
+          message: messageText,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Authentication failed')
+      }
+
+      const data = await response.json()
 
       setAuthState({
         isAuthenticated: true,
@@ -63,7 +83,7 @@ export function useWalletAuth() {
         error: null,
       })
 
-      return true
+      return data.success
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Authentication failed'
       setAuthState({
