@@ -20,35 +20,25 @@ CREATE INDEX idx_users_wallet ON users(wallet_address);
 -- Reports table
 CREATE TABLE reports (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  user_id TEXT NOT NULL, -- wallet address
 
-  -- Report metadata
-  title TEXT,
+  -- Full report data (JSON)
+  report_data JSONB NOT NULL,
+
+  -- Commitment hash for verification
+  commitment_hash TEXT NOT NULL,
+
+  -- Metadata
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   expires_at TIMESTAMP WITH TIME ZONE,
-  is_public BOOLEAN DEFAULT true,
+  view_count INTEGER DEFAULT 0,
 
-  -- Stats ranges (what's shown publicly)
-  volume_range TEXT NOT NULL,
-  trade_count_range TEXT NOT NULL,
-  win_rate_range TEXT NOT NULL,
-  avg_trade_size_range TEXT NOT NULL,
-  trading_period_days INTEGER NOT NULL,
-
-  -- ZK Proof data
-  proof_hash TEXT NOT NULL,
-  compressed_account_address TEXT,
-  verification_tx TEXT,
-
-  -- Privacy metadata
-  wallet_hash TEXT NOT NULL,
-
-  CONSTRAINT unique_proof UNIQUE(proof_hash)
+  CONSTRAINT unique_commitment UNIQUE(commitment_hash)
 );
 
 -- Create indexes
 CREATE INDEX idx_reports_user ON reports(user_id);
-CREATE INDEX idx_reports_proof ON reports(proof_hash);
+CREATE INDEX idx_reports_commitment ON reports(commitment_hash);
 CREATE INDEX idx_reports_created ON reports(created_at DESC);
 
 -- Analytics cache (optional, for faster repeat analysis)
@@ -84,22 +74,11 @@ CREATE POLICY "Users can insert own data" ON users
   FOR INSERT WITH CHECK (wallet_address = current_setting('app.wallet_address', true));
 
 -- Policies for reports table
-CREATE POLICY "Anyone can read public reports" ON reports
-  FOR SELECT USING (is_public = true);
-
-CREATE POLICY "Users can read own reports" ON reports
-  FOR SELECT USING (
-    user_id IN (
-      SELECT id FROM users WHERE wallet_address = current_setting('app.wallet_address', true)
-    )
-  );
+CREATE POLICY "Anyone can read reports" ON reports
+  FOR SELECT USING (true);
 
 CREATE POLICY "Users can create reports" ON reports
-  FOR INSERT WITH CHECK (
-    user_id IN (
-      SELECT id FROM users WHERE wallet_address = current_setting('app.wallet_address', true)
-    )
-  );
+  FOR INSERT WITH CHECK (true);
 
 -- Policies for analytics_cache table
 CREATE POLICY "Users can read own cache" ON analytics_cache

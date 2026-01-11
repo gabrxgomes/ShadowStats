@@ -1,11 +1,13 @@
 'use client'
 
+import { useState } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { ConnectButton } from '@/components/wallet/connect-button'
 import { WalletInfo } from '@/components/wallet/wallet-info'
 import { StatsCard } from '@/components/analytics/stats-card'
 import { TopTokens } from '@/components/analytics/top-tokens'
 import { RecentTrades } from '@/components/analytics/recent-trades'
+import { ReportGenerator } from '@/components/report/report-generator'
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAnalytics } from '@/hooks/use-analytics'
@@ -15,6 +17,7 @@ import Link from 'next/link'
 export default function Dashboard(): JSX.Element {
   const { connected } = useWallet()
   const { data, isLoading, error, cached, refetch } = useAnalytics()
+  const [showReportGenerator, setShowReportGenerator] = useState(false)
 
   if (!connected) {
     return (
@@ -79,17 +82,35 @@ export default function Dashboard(): JSX.Element {
               <p className="text-text-secondary">View your trading analytics and performance</p>
             </div>
             {!isLoading && data && (
-              <button
-                onClick={refetch}
-                className="px-4 py-2 bg-bg-tertiary border border-border rounded-lg text-sm font-medium hover:border-primary-400 hover:text-primary-400 transition-colors"
-              >
-                {cached ? 'Refresh Data' : 'Reload'}
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowReportGenerator(!showReportGenerator)}
+                  className="px-4 py-2 bg-gradient-solana rounded-lg text-sm font-medium text-bg-primary hover:opacity-90 transition-opacity"
+                >
+                  {showReportGenerator ? 'Hide Report Generator' : 'Generate Privacy Report'}
+                </button>
+                <button
+                  onClick={refetch}
+                  className="px-4 py-2 bg-bg-tertiary border border-border rounded-lg text-sm font-medium hover:border-primary-400 hover:text-primary-400 transition-colors"
+                >
+                  {cached ? 'Refresh Data' : 'Reload'}
+                </button>
+              </div>
             )}
           </div>
 
           <div className="space-y-6">
             <WalletInfo />
+
+            {showReportGenerator && data && !isLoading && (
+              <ReportGenerator
+                analytics={data}
+                onReportGenerated={(reportId, shareUrl) => {
+                  setShowReportGenerator(false)
+                  window.open(shareUrl, '_blank')
+                }}
+              />
+            )}
 
             {error && (
               <Card className="p-6 border-error/20 bg-error/5">
